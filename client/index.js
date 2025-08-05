@@ -126,7 +126,7 @@ const blockSize = canvasSize / 10
 const canvasEle = document.getElementById("canvas")
 canvasEle.height = canvasSize
 canvasEle.width = canvasSize
-canvasEle.style.backgroundColor = "#dd0"
+canvasEle.style.backgroundColor = "#868"
 const ctx = canvasEle.getContext("2d")
 
 const drawCircle = (x, y, r, fillColor) => {
@@ -162,4 +162,16 @@ for (let i = 1; i < 10; i++) {
 // drawPawn(1, 1, "green")
 // drawPawn(3, 0, "red")
 
-console.log(path)
+const drawSnake = () => {
+  ctx.beginPath()
+  ctx.lineWidth = "2";
+  ctx.fillStyle = "#dd7"
+  ctx.strokeStyle = "#fcf";
+  ctx.rect(50, 100, 500, 200)
+  ctx.fill()
+  ctx.stroke()
+}
+
+drawSnake()
+
+// console.log(path)
