@@ -110,24 +110,52 @@ const path = {
 }
 
 const snake = [
-  { m: 99, t: 5 },
-  { m: 93, t: 5 },
-  { m: 95, t: 10 },
+  { h: 18, t: 1 },
+  { h: 8, t: 4 },
+  { h: 26, t: 10 },
+  { h: 39, t: 5 },
+  { h: 51, t: 6 },
+  { h: 54, t: 36 },
+  { h: 56, t: 1 },
+  { h: 60, t: 23 },
+  { h: 75, t: 28 },
+  { h: 83, t: 45 },
+  { h: 85, t: 59 },
+  { h: 90, t: 48 },
+  { h: 92, t: 25 },
+  { h: 97, t: 87 },
+  { h: 99, t: 63 },
 ]
 
 const ladder = [
-  { m: 6, t: 90 },
-  { m: 6, t: 12 },
+  { from: 3, to: 20 },
+  { from: 6, to: 14 },
+  { from: 11, to: 28 },
+  { from: 15, to: 34 },
+  { from: 17, to: 74 },
+  { from: 22, to: 37 },
+  { from: 38, to: 59 },
+  { from: 49, to: 67 },
+  { from: 57, to: 76 },
+  { from: 61, to: 78 },
+  { from: 73, to: 86 },
+  { from: 81, to: 98 },
+  { from: 88, to: 91 },
 ]
 
 const canvasSize = 600
 const blockSize = canvasSize / 10
 
+const webpImage = new Image();
+webpImage.src = '../map.png'; // Replace with your WebP image path
 const canvasEle = document.getElementById("canvas")
 canvasEle.height = canvasSize
 canvasEle.width = canvasSize
-canvasEle.style.backgroundColor = "#868"
 const ctx = canvasEle.getContext("2d")
+
+webpImage.onload = () => {
+  ctx.drawImage(webpImage, 0, 0, canvasSize, canvasSize); // Example with custom position and size
+};
 
 const drawCircle = (x, y, r, fillColor) => {
   ctx.beginPath();
@@ -147,8 +175,8 @@ const drawLine = (x1, y1, x2, y2) => {
   ctx.stroke();
 }
 
-const drawPawn = (x, y, color) => {
-  drawCircle(blockSize / 2 + blockSize * x, blockSize / 2 + blockSize * y, blockSize / 2 - blockSize / 6, color)
+const drawPawn = (pathNum, color) => {
+  drawCircle(blockSize / 2 + blockSize * path[pathNum].x, blockSize / 2 + blockSize * path[pathNum].y, blockSize / 2 - blockSize / 6, color)
 }
 
 // y axis line draw
@@ -162,16 +190,6 @@ for (let i = 1; i < 10; i++) {
 // drawPawn(1, 1, "green")
 // drawPawn(3, 0, "red")
 
-const drawSnake = () => {
-  ctx.beginPath()
-  ctx.lineWidth = "2";
-  ctx.fillStyle = "#dd7"
-  ctx.strokeStyle = "#fcf";
-  ctx.rect(50, 100, 500, 200)
-  ctx.fill()
-  ctx.stroke()
-}
-
-drawSnake()
+drawPawn(1, "green")
 
 // console.log(path)
