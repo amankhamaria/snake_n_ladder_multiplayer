@@ -7,11 +7,11 @@ let turn = ""
 let clients = [
   // {
   //   name: "apple",
-  //   socketId: "djhgfds"
+  //   socketId: "5wPtBoGlK0v-7FLfAAAF"
   // },
   // {
   //   name: "apple",
-  //   socketId: "djhgfds"
+  //   socketId: "sHAHujgtGHV-7FLfAAAF"
   // }
 ]
 
@@ -31,7 +31,7 @@ io.on('connection', (socket) => {
       return
     }
     if (turn === "") {
-      turn = name
+      turn = socket.id
     }
     clients.push({ name, socketId: socket.id })
     console.log(clients)
@@ -49,14 +49,15 @@ io.on('connection', (socket) => {
       return
     }
     const client = clientArr[0]
-    console.log(client, index, turn)
-    if (turn === client.name) {
+    if (turn === client.socketId) {
       const diceValue = Math.ceil(Math.random() * 6)
       console.log(`Dice value : ${diceValue}`)
       io.emit('play', diceValue)
       index = (index + 1) % clients.length
-      turn = clients[index].name
-      console.log(turn)
+      turn = clients[index].socketId
+      console.log(`Next turn is : ${clients[index].name}, ${turn}`)
+    } else {
+      console.log(`Not your turn ${client.name} : ${client.socketId}`)
     }
   })
   socket.on('game', () => {
