@@ -54,8 +54,10 @@ io.on('connection', (socket) => {
     if (turn === client.socketId) {
       const diceValue = Math.ceil(Math.random() * 6)
       console.log(`Dice value : ${diceValue}`)
-      index = (index + 1) % clients.length
-      turn = clients[index].socketId
+      if (diceValue !== 6) {
+        index = (index + 1) % clients.length
+        turn = clients[index].socketId
+      }
       console.log(`Next turn is : ${clients[index].name}, ${turn}`)
       io.emit('game', { diceValue, clients, turn })
     } else {

@@ -1,4 +1,4 @@
-const socket = io('ws://192.168.1.36:5000')
+const socket = io('ws://127.0.0.1:5000')
 
 const turnEle = document.getElementById("turn")
 turnEle.innerHTML = ' '
