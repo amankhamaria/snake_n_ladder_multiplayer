@@ -1,11 +1,23 @@
 const socket = io('ws://192.168.1.36:5000')
 
+const turnEle = document.getElementById("turn")
+turnEle.innerHTML = ' '
+const diceValueEle = document.getElementById("dice")
+diceValueEle.innerHTML = ''
+
 const userName = prompt("enter your name")
 socket.on('info', (msg) => {
   console.log(msg)
+  console.log(`Name: ${userName}, ID : ${socket.id}`)
 })
-socket.on('game', ({ client, turn }) => {
-  console.log(client, turn)
+socket.on('game', ({ diceValue, clients, turn }) => {
+  console.log(clients, turn, socket.id)
+  if (turn === socket.id) {
+    turnEle.innerHTML = 'Your Turn'
+  } else {
+    turnEle.innerHTML = ''
+  }
+  diceValueEle.innerHTML = diceValue ? diceValue : ''
 })
 
 socket.emit('info', userName)
@@ -167,11 +179,6 @@ playBtnEle.style.backgroundColor = "#fcc"
 playBtnEle.style.color = "#000"
 playBtnEle.addEventListener('click', () => {
   socket.emit("play", "")
-})
-
-socket.on('play', (msg) => {
-  const diceValueEle = document.getElementById("dice")
-  diceValueEle.innerHTML = msg
 })
 
 const drawCircle = (x, y, r, fillColor) => {

@@ -33,7 +33,9 @@ io.on('connection', (socket) => {
     if (turn === "") {
       turn = socket.id
     }
+    socket.emit('info', 'hello from server')
     clients.push({ name, socketId: socket.id })
+    io.emit('game', { clients, turn })
     console.log(clients)
   })
   socket.on('play', () => {
@@ -52,21 +54,25 @@ io.on('connection', (socket) => {
     if (turn === client.socketId) {
       const diceValue = Math.ceil(Math.random() * 6)
       console.log(`Dice value : ${diceValue}`)
-      io.emit('play', diceValue)
       index = (index + 1) % clients.length
       turn = clients[index].socketId
       console.log(`Next turn is : ${clients[index].name}, ${turn}`)
+      io.emit('game', { diceValue, clients, turn })
     } else {
       console.log(`Not your turn ${client.name} : ${client.socketId}`)
     }
   })
-  socket.on('game', () => {
-    io.emit('game', { clients, turn })
-  })
+  // socket.on('game', () => {
+  //   io.emit('game', { clients, turn })
+  // })
   socket.on('disconnect', (msg) => {
     console.log(msg, socket.id)
     clients = clients.filter((e) => e.socketId != socket.id)
-    console.log(clients)
+    if (clients.length === 0) {
+      turn = ''
+    } else if (clients.length === 1) {
+      turn = clients[0].socketId
+    }
   })
 })
 
