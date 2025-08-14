@@ -40,36 +40,7 @@ io.on('connection', (socket) => {
     io.emit('game', { clients, turn })
     console.log(clients)
   })
-  socket.on('play', () => {
-    let index = -1
-    const clientArr = clients.filter((e, i) => {
-      const match = e.socketId === socket.id
-      if (match) {
-        index = i
-        return true
-      }
-    })
-    if (clientArr.length === 0) {
-      return
-    }
-    const client = clientArr[0]
-    if (turn === client.socketId) {
-      const diceValue = Math.ceil(Math.random() * 6)
-      console.log(`Dice value : ${diceValue}`)
-      client.position += diceValue
-      if (client.position > 100) {
-        client.position = 100
-      }
-      if (diceValue !== 6) {
-        index = (index + 1) % clients.length
-        turn = clients[index].socketId
-      }
-      console.log(`Next turn is : ${clients[index].name}, ${turn}`)
-      io.emit('game', { diceValue, clients, turn })
-    } else {
-      console.log(`Not your turn ${client.name} : ${client.socketId}`)
-    }
-  })
+  socket.on('play', playGame(socket))
   // socket.on('game', () => {
   //   io.emit('game', { clients, turn })
   // })
@@ -90,3 +61,43 @@ httpServer.listen(5000, (e) => {
   }
   console.log("server started on 5000");
 })
+
+const filterClient = (socketId) => {
+  let inx = -1
+  const clientArr = clients.filter((e, i) => {
+    const match = e.socketId === socketId
+    if (match) {
+      inx = i
+      return true
+    }
+  })
+  if (clientArr.length === 0) {
+    return { client: [], inx }
+  }
+  const client = clientArr[0]
+  return { client, inx }
+}
+
+const playGame = (socket) => {
+  return () => {
+    let index = -1
+    const { client, inx } = filterClient(socket.id)
+    index = inx
+    if (turn === client.socketId) {
+      const diceValue = Math.ceil(Math.random() * 6)
+      console.log(`Dice value : ${diceValue}`)
+      client.position += diceValue
+      if (client.position > 100) {
+        client.position = 100
+      }
+      if (diceValue !== 6) {
+        index = (index + 1) % clients.length
+        turn = clients[index].socketId
+      }
+      console.log(`Next turn is : ${clients[index].name}, ${turn}`)
+      io.emit('game', { diceValue, clients, turn })
+    } else {
+      console.log(`Not your turn ${client.name} : ${client.socketId}`)
+    }
+  }
+}
