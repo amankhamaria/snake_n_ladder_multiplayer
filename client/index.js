@@ -6,6 +6,9 @@ const diceValueEle = document.getElementById("dice")
 diceValueEle.innerHTML = ''
 
 const userName = prompt("enter your name")
+const pwanValue = prompt("enter number 0: blue, 1:yellow, 2:red, 3: green")
+const colorList = ["blue", "yellow", "red", "green"]
+const pwanColor = colorList[pwanValue]
 socket.on('info', (msg) => {
   console.log(msg)
   console.log(`Name: ${userName}, ID : ${socket.id}`)
@@ -153,8 +156,8 @@ const drawCircle = (x, y, r, fillColor) => {
   ctx.arc(x, y, r, 0, 2 * Math.PI);
   ctx.fillStyle = fillColor;
   ctx.fill();
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = "blue";
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = "white";
   ctx.stroke();
 }
 
@@ -185,6 +188,10 @@ const draw = (clients) => {
   ctx.drawImage(webpImage, 0, 0, canvasSize, canvasSize); // Example with custom position and size
   // draw pawn
   clients.forEach((e) => {
-    drawPawn(e.position, "green")
+    if (e.socketId === socket.id) {
+      drawPawn(e.position, pwanColor)
+    } else {
+      drawPawn(e.position, "cyan")
+    }
   })
 }
