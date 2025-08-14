@@ -17,6 +17,40 @@ let clients = [
   // }
 ]
 
+const snake = [
+  { h: 18, t: 1 },
+  { h: 8, t: 4 },
+  { h: 26, t: 10 },
+  { h: 39, t: 5 },
+  { h: 51, t: 6 },
+  { h: 54, t: 36 },
+  { h: 56, t: 1 },
+  { h: 60, t: 23 },
+  { h: 75, t: 28 },
+  { h: 83, t: 45 },
+  { h: 85, t: 59 },
+  { h: 90, t: 48 },
+  { h: 92, t: 25 },
+  { h: 97, t: 87 },
+  { h: 99, t: 63 },
+]
+
+const ladder = [
+  { from: 3, to: 20 },
+  { from: 6, to: 14 },
+  { from: 11, to: 28 },
+  { from: 15, to: 34 },
+  { from: 17, to: 74 },
+  { from: 22, to: 37 },
+  { from: 38, to: 59 },
+  { from: 49, to: 67 },
+  { from: 57, to: 76 },
+  { from: 61, to: 78 },
+  { from: 73, to: 86 },
+  { from: 81, to: 98 },
+  { from: 88, to: 91 },
+]
+
 const app = express()
 const httpServer = createServer(app)
 const io = new Server(httpServer, {
@@ -78,23 +112,83 @@ const filterClient = (socketId) => {
   return { client, inx }
 }
 
+const rollDice = () => {
+  const diceValue = Math.ceil(Math.random() * 6)
+  console.log(`Dice value : ${diceValue}`)
+  return diceValue
+}
+
+const isLadderPositionMatch = (position) => {
+  let ladderMatch = false
+  let to = -1
+  ladder.forEach((e, i) => {
+    if (e.from === position) {
+      ladderMatch = true
+      to = e.to
+      return
+    }
+  })
+  return { ladderMatch, to }
+}
+
+const isSnakePositionMatch = (position) => {
+  let snakeMatch = false
+  let t = -1
+  snake.forEach((e, i) => {
+    if (e.h === position) {
+      snakeMatch = true
+      t = e.t
+      return
+    }
+  })
+  return { snakeMatch, t }
+}
+
+const updatePosition = (position, diceValue) => {
+  position += diceValue
+  let { snakeMatch, t } = isSnakePositionMatch(position)
+  let { ladderMatch, to } = isLadderPositionMatch(position)
+  while (snakeMatch || ladderMatch) {
+    if (snakeMatch) {
+      position = t
+    }
+    if (ladderMatch) {
+      position = to
+    }
+    const s = isSnakePositionMatch(position)
+    snakeMatch = s.snakeMatch
+    t = s.t
+    const l = isLadderPositionMatch(position)
+    ladderMatch = l.ladderMatch
+    to = l.to
+  }
+
+  if (position > 100) {
+    position = 100
+  }
+  return position
+}
+
+const updateTurn = (index, diceValue) => {
+  if (diceValue !== 6) {
+    index = (index + 1) % clients.length
+    turn = clients[index].socketId
+  }
+  console.log(`Next turn is : ${clients[index].name}, ${turn}`)
+  return turn
+}
+
+const isTurn = (client) => {
+  return turn == client.socketId
+}
+
 const playGame = (socket) => {
   return () => {
-    let index = -1
     const { client, inx } = filterClient(socket.id)
-    index = inx
-    if (turn === client.socketId) {
-      const diceValue = Math.ceil(Math.random() * 6)
-      console.log(`Dice value : ${diceValue}`)
-      client.position += diceValue
-      if (client.position > 100) {
-        client.position = 100
-      }
-      if (diceValue !== 6) {
-        index = (index + 1) % clients.length
-        turn = clients[index].socketId
-      }
-      console.log(`Next turn is : ${clients[index].name}, ${turn}`)
+    if (isTurn(client)) {
+      const diceValue = rollDice()
+      client.position = updatePosition(client.position, diceValue)
+      turn = updateTurn(inx, diceValue)
       io.emit('game', { diceValue, clients, turn })
     } else {
       console.log(`Not your turn ${client.name} : ${client.socketId}`)
