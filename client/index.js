@@ -1,4 +1,4 @@
-const socket = io('ws://127.0.0.1:5000')
+const socket = io('ws://192.168.1.36:5000')
 
 const turnEle = document.getElementById("turn")
 turnEle.innerHTML = ' '
@@ -18,7 +18,8 @@ socket.on('game', ({ diceValue, clients, turn }) => {
   if (turn === socket.id) {
     turnEle.innerHTML = 'Your Turn'
   } else {
-    turnEle.innerHTML = ''
+    const c = clients.filter((e) => e.socketId == turn)
+    turnEle.innerHTML = `Turn : ${c[0].name}`
   }
   diceValueEle.innerHTML = diceValue ? diceValue : ''
   draw(clients)
@@ -188,10 +189,9 @@ const draw = (clients) => {
   ctx.drawImage(webpImage, 0, 0, canvasSize, canvasSize); // Example with custom position and size
   // draw pawn
   clients.forEach((e) => {
+    drawPawn(e.position, "cyan")
     if (e.socketId === socket.id) {
       drawPawn(e.position, pwanColor)
-    } else {
-      drawPawn(e.position, "cyan")
     }
   })
 }

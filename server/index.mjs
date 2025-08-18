@@ -85,6 +85,8 @@ io.on('connection', (socket) => {
       turn = ''
     } else if (clients.length === 1) {
       turn = clients[0].socketId
+    } else {
+      // TODO: solve turn issue
     }
   })
 })
