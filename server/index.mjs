@@ -18,21 +18,21 @@ let clients = [
 ]
 
 const snake = [
-  // { h: 18, t: 1 },
-  // { h: 8, t: 4 },
-  // { h: 26, t: 10 },
-  // { h: 39, t: 5 },
-  // { h: 51, t: 6 },
-  // { h: 54, t: 36 },
-  // { h: 56, t: 1 },
-  // { h: 60, t: 23 },
-  // { h: 75, t: 28 },
-  // { h: 83, t: 45 },
-  // { h: 85, t: 59 },
-  // { h: 90, t: 48 },
-  // { h: 92, t: 25 },
-  // { h: 97, t: 87 },
-  // { h: 99, t: 63 },
+  { h: 18, t: 1 },
+  { h: 8, t: 4 },
+  { h: 26, t: 10 },
+  { h: 39, t: 5 },
+  { h: 51, t: 6 },
+  { h: 54, t: 36 },
+  { h: 56, t: 1 },
+  { h: 60, t: 23 },
+  { h: 75, t: 28 },
+  { h: 83, t: 45 },
+  { h: 85, t: 59 },
+  { h: 90, t: 48 },
+  { h: 92, t: 25 },
+  { h: 97, t: 87 },
+  { h: 99, t: 63 },
 ]
 
 const ladder = [
@@ -70,7 +70,7 @@ io.on('connection', (socket) => {
       turn = socket.id
     }
     socket.emit('info', 'hello from server')
-    clients.push({ name, socketId: socket.id, position: 90 })
+    clients.push({ name, socketId: socket.id, position: 1 })
     io.emit('game', { clients, turn })
     console.log(clients)
   })
@@ -177,24 +177,16 @@ const updatePosition = (position, diceValue) => {
 
 const updateTurn = (index, diceValue) => {
   if (diceValue !== 6) {
-    let count = clients.length
-    while (true) {
+    for (let i = 0; i < clients.length; i++) {
       index = (index + 1) % clients.length
-      console.log(index)
       turn = clients[index].socketId
-      console.log(turn, index)
       if (clients[index].position >= 100) {  // check for position if user has completed the game
         index = (index + 1) % clients.length
         turn = clients[index].socketId
-        if (count <= 0) {
-          break
-        }
       } else {
         break
       }
-      count--;
     }
-    console.log("next turn updated")
   }
   console.log(`Next turn is : ${clients[index].name}, ${turn}`)
   return turn
