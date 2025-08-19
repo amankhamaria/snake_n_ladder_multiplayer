@@ -15,7 +15,24 @@ for (let i = 0; i < maxNumberOfPawns; i++) {
   totalPawnImageEleList.push(imageElement)
 }
 const pawnEle = totalPawnImageEleList[pawnValue]
-const pawnImageEleList = totalPawnImageEleList.filter((e) => e !== pawnEle)
+let pawnImageEleList = totalPawnImageEleList.filter((e) => e !== pawnEle)
+
+const cClients = {}
+
+const assignColor = (clients) => {
+  console.log(clients)
+  clients.forEach((e) => {
+    if (pawnImageEleList.length === 0) {
+      console.log("all pawn image has selected")
+      return
+    }
+    if (!cClients[e.socketId]) {
+      const selectedPawnImg = pawnImageEleList[Math.floor(Math.random() * pawnImageEleList.length)]
+      cClients[e.socketId] = selectedPawnImg
+      pawnImageEleList = pawnImageEleList.filter((e) => e !== selectedPawnImg)
+    }
+  })
+}
 
 const socket = io('ws://192.168.1.36:5000')
 
@@ -24,7 +41,8 @@ socket.on('info', (msg) => {
   console.log(`Name: ${userName}, ID: ${socket.id} `)
 })
 socket.on('game', ({ diceValue, clients, turn }) => {
-  console.log(clients, turn, socket.id)
+  // console.log(clients, turn, socket.id)
+  assignColor(clients)
   if (turn === socket.id) {
     turnEle.innerHTML = 'Your Turn'
   } else {
@@ -199,7 +217,7 @@ const draw = (clients) => {
   ctx.drawImage(webpImage, 0, 0, canvasSize, canvasSize); // Example with custom position and size
   // draw pawn
   clients.forEach((e) => {
-    drawPawn(pawnImageEleList[Math.floor(Math.random() * pawnImageEleList.length)], e.position)
+    drawPawn(cClients[e.socketId], e.position)
     if (e.socketId === socket.id) {
       drawPawn(pawnEle, e.position)
     }
