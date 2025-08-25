@@ -4,6 +4,9 @@ const turnEle = document.getElementById("turn")
 turnEle.innerHTML = ' '
 const diceValueEle = document.getElementById("dice")
 diceValueEle.innerHTML = ''
+const playBtnEle = document.getElementById("play")
+playBtnEle.style.backgroundColor = "#fcc"
+playBtnEle.style.color = "#000"
 
 const userName = prompt("enter your name")
 const pawnValue = prompt("enter number 0: blue, 1:yellow, 2:red, 3: green") || 0
@@ -16,6 +19,7 @@ for (let i = 0; i < maxNumberOfPawns; i++) {
 }
 const pawnEle = totalPawnImageEleList[pawnValue]
 let pawnImageEleList = totalPawnImageEleList.filter((e) => e !== pawnEle)
+
 
 const cClients = {}
 const lastClientsPos = {}
@@ -42,6 +46,7 @@ socket.on('info', (msg) => {
   console.log(`Name: ${userName}, ID: ${socket.id} `)
 })
 socket.on('game', async ({ diceValue, clients, turn }) => {
+  playBtnEle.disabled = false
   // console.log(clients, turn, socket.id)
   assignColor(clients)
   // record postion of any new player
@@ -59,6 +64,16 @@ socket.on('game', async ({ diceValue, clients, turn }) => {
   }
   diceValueEle.innerHTML = diceValue ? diceValue : ''
   await drawAnimation(clients)
+})
+
+socket.on("game_over", (winnerList) => {
+  console.log(winnerList)
+  playBtnEle.disabled = true
+  turnEle.innerHTML = "Winner is: "
+
+  winnerList.forEach((e, i) => {
+    turnEle.innerHTML += ` ${i + 1}. ${e.name} `
+  })
 })
 
 socket.emit('info', userName)
@@ -180,10 +195,6 @@ webpImage.onload = () => {
   ctx.drawImage(webpImage, 0, 0, canvasSize, canvasSize); // Example with custom position and size
 };
 
-const playBtnEle = document.getElementById("play")
-// playBtnEle.disabled = true
-playBtnEle.style.backgroundColor = "#fcc"
-playBtnEle.style.color = "#000"
 playBtnEle.addEventListener('click', () => {
   socket.emit("play", "")
 })

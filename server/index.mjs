@@ -18,21 +18,21 @@ let clients = [
 ]
 
 const snake = [
-  { h: 18, t: 1 },
-  { h: 8, t: 4 },
-  { h: 26, t: 10 },
-  { h: 39, t: 5 },
-  { h: 51, t: 6 },
-  { h: 54, t: 36 },
-  { h: 56, t: 1 },
-  { h: 60, t: 23 },
-  { h: 75, t: 28 },
-  { h: 83, t: 45 },
-  { h: 85, t: 59 },
-  { h: 90, t: 48 },
-  { h: 92, t: 25 },
-  { h: 97, t: 87 },
-  { h: 99, t: 63 },
+  // { h: 18, t: 1 },
+  // { h: 8, t: 4 },
+  // { h: 26, t: 10 },
+  // { h: 39, t: 5 },
+  // { h: 51, t: 6 },
+  // { h: 54, t: 36 },
+  // { h: 56, t: 1 },
+  // { h: 60, t: 23 },
+  // { h: 75, t: 28 },
+  // { h: 83, t: 45 },
+  // { h: 85, t: 59 },
+  // { h: 90, t: 48 },
+  // { h: 92, t: 25 },
+  // { h: 97, t: 87 },
+  // { h: 99, t: 63 },
 ]
 
 const ladder = [
@@ -50,6 +50,8 @@ const ladder = [
   { from: 81, to: 98 },
   { from: 88, to: 91 },
 ]
+
+let winnerList = []
 
 const app = express()
 const httpServer = createServer(app)
@@ -70,7 +72,7 @@ io.on('connection', (socket) => {
       turn = socket.id
     }
     socket.emit('info', 'hello from server')
-    clients.push({ name, socketId: socket.id, position: 1 })
+    clients.push({ name, socketId: socket.id, position: 98 })
     io.emit('game', { clients, turn })
     console.log(clients)
   })
@@ -196,6 +198,23 @@ const isTurn = (client) => {
   return turn == client.socketId
 }
 
+const checkWinner = () => {
+  clients.forEach((c) => {
+    if (c.position >= 100) {
+      let isAdded = false
+      winnerList.forEach((w) => {
+        if (w.socketId === c.socketId) {
+          isAdded = true
+        }
+      })
+      if (!isAdded) {
+        winnerList.push({ socketId: c.socketId, name: c.name })
+      }
+    }
+  })
+  console.log(winnerList)
+}
+
 const playGame = (socket) => {
   return () => {
     const { client, inx } = filterClient(socket.id)
@@ -203,7 +222,25 @@ const playGame = (socket) => {
       const diceValue = rollDice()
       client.position = updatePosition(client.position, diceValue)
       turn = updateTurn(inx, diceValue)
+      checkWinner()
       io.emit('game', { diceValue, clients, turn })
+
+      // check for no of players having position less than 100
+      if (clients.length > 1) {
+        const nop = clients.filter((c) => c.position < 100)
+        if (nop.length < 2) {
+          console.log("game over triggered")
+          io.emit('game_over', winnerList)
+
+          setTimeout(() => {
+            clients.forEach((e, i) => {
+              clients[i].position = 1
+            })
+            winnerList = []
+            io.emit('game', { clients, turn })
+          }, 5000)
+        }
+      }
     } else {
       console.log(`Not your turn ${client.name} : ${client.socketId}`)
     }
