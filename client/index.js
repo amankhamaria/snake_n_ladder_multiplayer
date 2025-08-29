@@ -39,7 +39,11 @@ const assignColor = (clients) => {
   })
 }
 
+<<<<<<< HEAD
 const socket = io('ws://192.168.1.198:5000')
+=======
+const socket = io('ws://192.168.1.36:5000')
+>>>>>>> 7cf4ea5b3ea5b3017b456ee19c43fac14f36e54f
 
 socket.on('info', (msg) => {
   console.log(msg)

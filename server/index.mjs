@@ -18,6 +18,7 @@ let clients = [
 ]
 
 const snake = [
+<<<<<<< HEAD
   { h: 18, t: 1 },
   { h: 8, t: 4 },
   { h: 26, t: 10 },
@@ -33,6 +34,23 @@ const snake = [
   { h: 92, t: 25 },
   { h: 97, t: 87 },
   { h: 99, t: 63 },
+=======
+  // { h: 18, t: 1 },
+  // { h: 8, t: 4 },
+  // { h: 26, t: 10 },
+  // { h: 39, t: 5 },
+  // { h: 51, t: 6 },
+  // { h: 54, t: 36 },
+  // { h: 56, t: 1 },
+  // { h: 60, t: 23 },
+  // { h: 75, t: 28 },
+  // { h: 83, t: 45 },
+  // { h: 85, t: 59 },
+  // { h: 90, t: 48 },
+  // { h: 92, t: 25 },
+  // { h: 97, t: 87 },
+  // { h: 99, t: 63 },
+>>>>>>> 7cf4ea5b3ea5b3017b456ee19c43fac14f36e54f
 ]
 
 const ladder = [
@@ -72,7 +90,11 @@ io.on('connection', (socket) => {
       turn = socket.id
     }
     socket.emit('info', 'hello from server')
+<<<<<<< HEAD
     clients.push({ name, socketId: socket.id, position: 1 })
+=======
+    clients.push({ name, socketId: socket.id, position: 98 })
+>>>>>>> 7cf4ea5b3ea5b3017b456ee19c43fac14f36e54f
     io.emit('game', { clients, turn })
     console.log(clients)
   })
